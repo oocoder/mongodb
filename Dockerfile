@@ -7,13 +7,28 @@
 # Pull base image.
 FROM debian:wheezy
 
+RUN apt-get update && apt-get install -y \
+		ca-certificates \
+		curl
+
+ENV MONGODB_VERSION 2.6
+
+# Signature file keys for build 2.6        
+RUN curl -SLk "https://hkps.pool.sks-keyservers.net/pks/lookup?op=get&search=0xAAB2461C" | gpg --import
+
+# In case for a different major/minor version you can use this command instead. 
+# curl -kLS "https://www.mongodb.org/static/pgp/server-$MONGODB_VERSION.asc" | gpg --import 
+
+                
 # Install MongoDB.
 RUN \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
-  echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' > /etc/apt/sources.list.d/mongodb.list && \
-  apt-get update && \
-  apt-get install -y mongodb-org=2.6.5 && \
-  rm -rf /var/lib/apt/lists/*
+    curl -kLO "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz" \
+    && curl -kLO "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz.sig" \
+    && gpg --verify mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz.sig mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz \
+    && tar -zxvf mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz -C /usr/local --strip-components=1 \     
+	&& rm -rf mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz  mongodb-linux-x86_64-v$MONGODB_VERSION-latest.tgz.sig \
+    && mkdir -p /data/db
+
 
 # Define mountable directories.
 VOLUME ["/data/db"]
@@ -28,4 +43,4 @@ CMD ["mongod"]
 #   - 27017: process
 #   - 28017: http
 EXPOSE 27017
-#EXPOSE 28017
+EXPOSE 28017
