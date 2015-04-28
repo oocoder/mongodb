@@ -24,7 +24,7 @@ RUN curl -SLk --ssl-allow-beast "https://hkps.pool.sks-keyservers.net/pks/lookup
 RUN \
     curl -kLO "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-$MONGODB_VERSION.tgz" \
     && curl -kLO "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-$MONGODB_VERSION-latest.tgz.sig" \
-    && gpg --verify mongodb-linux-x86_64-v$MONGODB_VERSION.tgz.sig mongodb-linux-x86_64-$MONGODB_VERSION.tgz \
+    && gpg --verify mongodb-linux-x86_64-$MONGODB_VERSION.tgz.sig mongodb-linux-x86_64-$MONGODB_VERSION.tgz \
     && tar -zxvf mongodb-linux-x86_64-$MONGODB_VERSION.tgz -C /usr/local --strip-components=1 \     
     && rm -rf mongodb-linux-x86_64-$MONGODB_VERSION.tgz  mongodb-linux-x86_64-$MONGODB_VERSION.tgz.sig \
     && mkdir -p /data/db
